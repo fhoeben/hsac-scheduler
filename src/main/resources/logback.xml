@@ -1,0 +1,46 @@
+<configuration debug="false">
+    <property name="LOG_DIR" value="./" />
+    <property name="APP_NAME" value="scheduler" />
+    
+    <contextName>${APP_NAME}</contextName>
+    <jmxConfigurator/>
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator" />
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type
+        ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>%d %-5level [%thread] %logger - %X{triggerName} - %msg %ex%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}${APP_NAME}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${LOG_DIR}${APP_NAME}-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+
+            <!-- keep 30 days' worth of history -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d %-5level [%thread] %logger - %X{triggerName} - %msg %ex%n</pattern>
+        </encoder>
+    </appender>
+    
+    <root level="WARN">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+    </root>
+    <logger name="org.quartz.plugins.history.LoggingTriggerHistoryPlugin">
+        <level value="WARN" />
+    </logger>
+    <logger name="nl.hsac">
+        <level value="INFO" />
+    </logger>
+	<logger name="nl.hsac.scheduler.jobs.test">
+		<level value="WARN" />
+	</logger>
+
+</configuration>

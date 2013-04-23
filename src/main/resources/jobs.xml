@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='utf-8'?>
+<job-scheduling-data xmlns="http://www.quartz-scheduler.org/xml/JobSchedulingData"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://www.quartz-scheduler.org/xml/JobSchedulingData http://www.quartz-scheduler.org/xml/job_scheduling_data_2_0.xsd"
+                     version="2.0">
+    <pre-processing-commands>
+        <delete-jobs-in-group>*</delete-jobs-in-group>
+    </pre-processing-commands>
+    <processing-directives>
+        <overwrite-existing-data>true</overwrite-existing-data>
+        <ignore-duplicates>false</ignore-duplicates>
+    </processing-directives>
+    <schedule>
+        <job>
+            <name>google-job</name>
+            <group>test</group>
+
+            <description>Check whether we can reach google.</description>
+            <job-class>nl.hsac.scheduler.jobs.HttpGetJob</job-class>
+            <durability>false</durability>
+            <recover>false</recover>
+            <job-data-map>
+                <entry>
+                    <key>url</key>
+                    <value>http://www.google.nl</value>
+                </entry>
+            </job-data-map>
+        </job>
+
+        <trigger>
+            <cron>
+                <name>google-trigger</name>
+                <group>test</group>
+                <job-name>google-job</job-name>
+                <job-group>test</job-group>
+
+                <misfire-instruction>MISFIRE_INSTRUCTION_DO_NOTHING</misfire-instruction>
+                <cron-expression>*/10 * * * * ?</cron-expression>
+            </cron>
+        </trigger>
+    </schedule>
+</job-scheduling-data>
