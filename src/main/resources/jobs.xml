@@ -27,11 +27,11 @@
 	            <!-- Optional overrides of Http client parameters -->
 	            <entry>
 		            <key>http.connection.timeout</key>
-		            <value>1</value>
+		            <value>500</value>
 	            </entry>
 	            <entry>
 		            <key>http.socket.timeout</key>
-		            <value>1</value>
+		            <value>1000</value>
 	            </entry>
             </job-data-map>
         </job>
