@@ -3,10 +3,16 @@ package nl.hsac.scheduler.jobs;
 import nl.hsac.scheduler.util.HttpClient;
 import nl.hsac.scheduler.util.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.params.AllClientPNames;
 import org.apache.http.conn.HttpHostConnectException;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+
+import java.net.SocketTimeoutException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Job that makes Http call. HttpResponse is stored in jobExecutionContext.
@@ -24,7 +30,8 @@ public abstract class HttpJob extends JobBase {
         HttpResponse response = createHttpResponse(url, jobDataMap);
         jobExecutionContext.setResult(response);
         try {
-            client.get(url, response);
+            Map<String, Object> httpParams = getHttpParams(jobDataMap);
+            makeHttpCall(client, httpParams, url, response);
         } catch (RuntimeException e) {
             handleGetException(jobExecutionContext, url, response, e);
         }
@@ -35,6 +42,30 @@ public abstract class HttpJob extends JobBase {
             throw new JobExecutionException(e);
         }
     }
+
+    protected Map<String, Object> getHttpParams(JobDataMap jobDataMap) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        copyIntIfPresent(jobDataMap, result, AllClientPNames.CONNECTION_TIMEOUT);
+        copyIntIfPresent(jobDataMap, result, AllClientPNames.SO_TIMEOUT);
+        return result;
+    }
+
+    private void copyIntIfPresent(JobDataMap source, Map<String, Object> target, String key) {
+        Object value = source.get(key);
+        if (value != null) {
+            String valueStr = (String) value;
+            target.put(key, Integer.valueOf(valueStr));
+        }
+    }
+
+    /**
+     * Performs actual http call.
+     * @param client client to make call with.
+     * @param httpParams override parameters for call.
+     * @param url url to call.
+     * @param response response to fill.
+     */
+    protected abstract void makeHttpCall(HttpClient client, Map<String, Object> httpParams, String url, HttpResponse response);
 
     /**
      * @param jobDataMap job data.
@@ -62,12 +93,18 @@ public abstract class HttpJob extends JobBase {
      */
     protected void handleGetException(JobExecutionContext context, String url, HttpResponse response, RuntimeException e) throws JobExecutionException {
         Throwable cause = e.getCause();
-        if (cause instanceof HttpHostConnectException) {
+        Logger log = getLog();
+        if (cause instanceof HttpHostConnectException
+                || cause instanceof SocketTimeoutException) {
             String msg = String.format("%s: '%s'", e.getMessage(), cause.getMessage());
-            getLog().warn(msg);
+            if (log.isDebugEnabled()) {
+                log.warn(msg, e);
+            } else {
+                log.warn(msg);
+            }
             throw new JobExecutionException(msg, e);
         } else {
-            getLog().error("Error", e);
+            log.error("Error", e);
         }
         throw new JobExecutionException(e);
     }

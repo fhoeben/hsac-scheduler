@@ -24,6 +24,15 @@
                     <key>url</key>
                     <value>http://www.google.nl</value>
                 </entry>
+	            <!-- Optional overrides of Http client parameters -->
+	            <entry>
+		            <key>http.connection.timeout</key>
+		            <value>1</value>
+	            </entry>
+	            <entry>
+		            <key>http.socket.timeout</key>
+		            <value>1</value>
+	            </entry>
             </job-data-map>
         </job>
 

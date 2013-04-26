@@ -1,7 +1,10 @@
 package nl.hsac.scheduler.jobs;
 
+import nl.hsac.scheduler.util.HttpClient;
 import nl.hsac.scheduler.util.HttpResponse;
 import org.quartz.JobDataMap;
+
+import java.util.Map;
 
 /**
  * Job to perform HTTP POST.
@@ -17,6 +20,11 @@ public class HttpPostJob extends HttpJob {
         String request = getRequest(jobDataMap);
         response.setRequest(request);
         return response;
+    }
+
+    @Override
+    protected void makeHttpCall(HttpClient client,  Map<String, Object> httpParams, String url, HttpResponse response) {
+        client.post(url, response, httpParams);
     }
 
     /**

@@ -9,27 +9,56 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DecompressingHttpClient;
 import org.apache.http.impl.client.SystemDefaultHttpClient;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import java.util.Map;
 
 /**
  * Helper to make Http calls and get response.
  */
 public class HttpClient {
+    private static final int MAX_CONNECTIONS = PropertyHelper.getIntProperty("http.maxconnections.total");
+    private static final int MAX_CONNECTIONS_PER_ROUTE = PropertyHelper.getIntProperty("http.maxconnections.perroute");
+
     private final ContentType type = ContentType.create(ContentType.TEXT_XML.getMimeType(), Consts.UTF_8);
     private static final org.apache.http.client.HttpClient HTTP_CLIENT;
     private org.apache.http.client.HttpClient httpClient;
 
     static {
         SystemDefaultHttpClient backend = new SystemDefaultHttpClient();
+        setIntParam(backend, "http.connection.timeout");
+        setIntParam(backend, "http.socket.timeout");
+        setLongParam(backend, "http.conn-manager.timeout");
+
         PoolingClientConnectionManager cm = (PoolingClientConnectionManager) backend.getConnectionManager();
-        // Increase max total connection to 200
-        cm.setMaxTotal(200);
-        // Increase default max connection per route to 20
-        cm.setDefaultMaxPerRoute(20);
+        cm.setMaxTotal(MAX_CONNECTIONS);
+        cm.setDefaultMaxPerRoute(MAX_CONNECTIONS_PER_ROUTE);
         HTTP_CLIENT = new DecompressingHttpClient(backend);
+    }
+
+    /**
+     * Sets a http client property based on value in this application's property file.
+     * @param client client to set parameter on.
+     * @param key key for parameter, the value will be retrieved from property with same name.
+     */
+    private static void setIntParam(org.apache.http.client.HttpClient client, String key) {
+        HttpParams clientParams = client.getParams();
+        int value = PropertyHelper.getIntProperty(key);
+        clientParams.setParameter(key, value);
+    }
+
+    /**
+     * Sets a http client property based on value in this application's property file.
+     * @param client client to set parameter on.
+     * @param key key for parameter, the value will be retrieved from property with same name.
+     */
+    private static void setLongParam(org.apache.http.client.HttpClient client, String key) {
+        HttpParams clientParams = client.getParams();
+        long value = PropertyHelper.getLongProperty(key);
+        clientParams.setParameter(key, value);
     }
 
     /**
@@ -44,8 +73,9 @@ public class HttpClient {
      * @param response response pre-populated with request to send. Response content and
      *          statusCode will be filled.
      */
-    public void post(String url, HttpResponse response) {
+    public void post(String url, HttpResponse response, Map<String, Object> parameters) {
         HttpPost methodPost = new HttpPost(url);
+        setParameters(methodPost, parameters);
         HttpEntity ent = new StringEntity(response.getRequest(), type);
         methodPost.setEntity(ent);
         getResponse(url, response, methodPost);
@@ -55,9 +85,17 @@ public class HttpClient {
      * @param url URL of service
      * @param response response to be filled.
      */
-    public void get(String url, HttpResponse response) {
+    public void get(String url, HttpResponse response, Map<String, Object> parameters) {
         HttpGet method = new HttpGet(url);
+        setParameters(method, parameters);
         getResponse(url, response, method);
+    }
+
+    private void setParameters(HttpRequestBase method, Map<String, Object> parameters) {
+        HttpParams methodParams = method.getParams();
+        for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+            methodParams.setParameter(entry.getKey(), entry.getValue());
+        }
     }
 
     private void getResponse(String url, HttpResponse response, HttpRequestBase method) {
