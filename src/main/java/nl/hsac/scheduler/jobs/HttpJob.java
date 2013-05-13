@@ -5,6 +5,7 @@ import nl.hsac.scheduler.util.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.params.AllClientPNames;
 import org.apache.http.conn.HttpHostConnectException;
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -16,7 +17,9 @@ import java.util.Map;
 
 /**
  * Job that makes Http call. HttpResponse is stored in jobExecutionContext.
+ * No new calls will be made, until previous call returned a response (or timed out).
  */
+@DisallowConcurrentExecution
 public abstract class HttpJob extends JobBase {
     /** KEY used to determine URL. */
     public static final String URL_KEY = "url";
