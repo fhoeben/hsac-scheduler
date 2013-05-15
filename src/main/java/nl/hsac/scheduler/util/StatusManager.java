@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Tracks job statuses.
  */
-public final class StatusManager {
+public final class  StatusManager {
     /** Start of response in case all is well. */
     public final static String OK = "OK";
     /** Start of response in case all is is NOT well. */
