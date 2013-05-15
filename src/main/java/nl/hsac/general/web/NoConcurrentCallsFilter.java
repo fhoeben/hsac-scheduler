@@ -1,12 +1,8 @@
-package nl.hsac.util;
+package nl.hsac.general.web;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -15,16 +11,24 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Filter to prevent a path from serving more than one concurrent requests at
  * any time.
  */
+@SuppressWarnings("PMD.LoggerIsNotStaticFinal")
 public class NoConcurrentCallsFilter implements Filter {
     private static final ConcurrentMap<String, NoConcurrentCallsFilter>
             FILTERS = new ConcurrentHashMap<String, NoConcurrentCallsFilter>();
+    // temporary unavailable
+    private static final int BUSY_HTTP_STATUS = 503;
 
     private Logger log;
     private String name;
@@ -114,8 +118,7 @@ public class NoConcurrentCallsFilter implements Filter {
             writer.flush();
         }
         if (response instanceof HttpServletResponse) {
-            // temporary unavailable
-            ((HttpServletResponse) response).setStatus(503);
+            ((HttpServletResponse) response).setStatus(BUSY_HTTP_STATUS);
         }
     }
 
