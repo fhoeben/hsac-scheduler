@@ -99,7 +99,7 @@ public abstract class JobBase implements Job {
 
     private String getMessage(JobExecutionContext context, String message) {
         StringBuilder result = new StringBuilder();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         result.append(" (fired on: ");
         Date fireTime = context.getFireTime();
         if (fireTime == null) {
