@@ -34,7 +34,8 @@ public abstract class HttpJob extends JobBase {
         jobExecutionContext.setResult(response);
         try {
             Map<String, Object> httpParams = getHttpParams(jobDataMap);
-            makeHttpCall(client, httpParams, url, response);
+            Map<String, String> httpHeaders = getHeaders(jobDataMap);
+            makeHttpCall(client, httpParams, httpHeaders, url, response);
         } catch (RuntimeException e) {
             handleGetException(jobExecutionContext, url, response, e);
         }
@@ -44,6 +45,21 @@ public abstract class HttpJob extends JobBase {
             getLog().warn("Did not get a valid response from {}, got: '{}'", url, response.getResponse(), e);
             throw new JobExecutionException(e);
         }
+    }
+
+    protected Map<String, String> getHeaders(JobDataMap jobDataMap) {
+        Map<String, String> headers = null;
+        for (Map.Entry<String, Object> entry : jobDataMap.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            if (key.startsWith("header:")) {
+                if (headers == null) {
+                    headers = new HashMap<String, String>();
+                }
+                headers.put(key.substring("header:".length()), value.toString());
+            }
+        }
+        return headers;
     }
 
     protected Map<String, Object> getHttpParams(JobDataMap jobDataMap) {
@@ -65,10 +81,11 @@ public abstract class HttpJob extends JobBase {
      * Performs actual http call.
      * @param client client to make call with.
      * @param httpParams override parameters for call.
+     * @param httpHeaders headers for call.
      * @param url url to call.
      * @param response response to fill.
      */
-    protected abstract void makeHttpCall(HttpClient client, Map<String, Object> httpParams, String url, HttpResponse response);
+    protected abstract void makeHttpCall(HttpClient client, Map<String, Object> httpParams, Map<String, String> httpHeaders, String url, HttpResponse response);
 
     /**
      * @param jobDataMap job data.

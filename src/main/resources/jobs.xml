@@ -24,7 +24,8 @@
                     <key>url</key>
                     <value>http://www.google.nl</value>
                 </entry>
-	            <!-- Optional overrides of Http client parameters -->
+	            <!-- Optional overrides of Http client parameters,
+	                 use keys with header: prefix to set http headers -->
 	            <entry>
 		            <key>http.connection.timeout</key>
 		            <value>500</value>

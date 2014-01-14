@@ -19,7 +19,7 @@ public class HttpGetJob extends HttpJob {
     }
 
     @Override
-    protected void makeHttpCall(HttpClient client,  Map<String, Object> httpParams, String url, HttpResponse response) {
-        client.get(url, response, httpParams);
+    protected void makeHttpCall(HttpClient client,  Map<String, Object> httpParams, Map<String, String> httpHeaders, String url, HttpResponse response) {
+        client.get(url, response, httpHeaders, httpParams);
     }
 }

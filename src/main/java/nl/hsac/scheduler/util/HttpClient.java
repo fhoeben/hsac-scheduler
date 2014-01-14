@@ -66,16 +66,19 @@ public class HttpClient {
      */
     public HttpClient() {
         httpClient = HTTP_CLIENT;
+        httpClient.getParams().setParameter("http.useragent", getClass().getName());
     }
 
     /**
      * @param url URL of service
      * @param response response pre-populated with request to send. Response content and
      *          statusCode will be filled.
+     * @param headers headers for request.
+     * @param parameters parameters for http client to set on request.
      */
-    public void post(String url, HttpResponse response, Map<String, Object> parameters) {
+    public void post(String url, HttpResponse response, Map<String, String> headers, Map<String, Object> parameters) {
         HttpPost methodPost = new HttpPost(url);
-        setParameters(methodPost, parameters);
+        setParametersAndHeaders(methodPost, parameters, headers);
         HttpEntity ent = new StringEntity(response.getRequest(), type);
         methodPost.setEntity(ent);
         getResponse(url, response, methodPost);
@@ -84,23 +87,44 @@ public class HttpClient {
     /**
      * @param url URL of service
      * @param response response to be filled.
+     * @param headers headers for request.
+     * @param parameters parameters for http client to set on request.
      */
-    public void get(String url, HttpResponse response, Map<String, Object> parameters) {
+    public void get(String url, HttpResponse response, Map<String, String> headers, Map<String, Object> parameters) {
         HttpGet method = new HttpGet(url);
-        setParameters(method, parameters);
+        setParametersAndHeaders(method, parameters, headers);
         getResponse(url, response, method);
     }
 
+    private void setParametersAndHeaders(HttpRequestBase method,
+                                            Map<String, Object> parameters, Map<String, String> headers) {
+        setParameters(method, parameters);
+        setHeaders(method, headers);
+    }
+
     private void setParameters(HttpRequestBase method, Map<String, Object> parameters) {
-        HttpParams methodParams = method.getParams();
-        for (Map.Entry<String, Object> entry : parameters.entrySet()) {
-            methodParams.setParameter(entry.getKey(), entry.getValue());
+        if (parameters != null) {
+            HttpParams methodParams = method.getParams();
+            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                methodParams.setParameter(key, value);
+            }
+        }
+    }
+
+    private void setHeaders(HttpRequestBase method, Map<String, String> headers) {
+        if (headers != null) {
+            for (String key : headers.keySet()) {
+                String value = headers.get(key);
+                if (value != null) {
+                    method.setHeader(key, value);
+                }
+            }
         }
     }
 
     private void getResponse(String url, HttpResponse response, HttpRequestBase method) {
-        httpClient.getParams().setParameter("http.useragent", getClass().getName());
-
         try {
             org.apache.http.HttpResponse resp = getHttpResponse(url, method);
             int returnCode = resp.getStatusLine().getStatusCode();
@@ -110,7 +134,7 @@ public class HttpClient {
         } catch (Exception e) {
             throw new RuntimeException("Unable to get response from: " + url, e);
         } finally {
-            method.releaseConnection();
+            method.reset();
         }
     }
 

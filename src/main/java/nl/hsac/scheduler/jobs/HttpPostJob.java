@@ -23,8 +23,8 @@ public class HttpPostJob extends HttpJob {
     }
 
     @Override
-    protected void makeHttpCall(HttpClient client,  Map<String, Object> httpParams, String url, HttpResponse response) {
-        client.post(url, response, httpParams);
+    protected void makeHttpCall(HttpClient client,  Map<String, Object> httpParams, Map<String, String> httpHeaders, String url, HttpResponse response) {
+        client.post(url, response, httpHeaders, httpParams);
     }
 
     /**
