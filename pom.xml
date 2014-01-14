@@ -6,16 +6,16 @@
 
     <groupId>nl.hsac</groupId>
     <artifactId>hsac-scheduler</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
     <packaging>war</packaging>
 
     <name>Scheduler Web Application</name>
     <description>Generic web application that can make http calls on a schedule defined using Quartz.</description>
 
     <properties>
-        <logback.version>1.0.9</logback.version>
+        <logback.version>1.0.13</logback.version>
         <quartz.version>2.1.7</quartz.version>
-        <httpClient.version>4.2.3</httpClient.version>
+        <httpClient.version>4.2.6</httpClient.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
