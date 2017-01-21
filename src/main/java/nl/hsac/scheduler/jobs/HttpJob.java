@@ -3,7 +3,6 @@ package nl.hsac.scheduler.jobs;
 import nl.hsac.scheduler.util.HttpClient;
 import nl.hsac.scheduler.util.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.params.AllClientPNames;
 import org.apache.http.conn.HttpHostConnectException;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobDataMap;
@@ -64,8 +63,9 @@ public abstract class HttpJob extends JobBase {
 
     protected Map<String, Object> getHttpParams(JobDataMap jobDataMap) {
         Map<String, Object> result = new HashMap<String, Object>();
-        copyIntIfPresent(jobDataMap, result, AllClientPNames.CONNECTION_TIMEOUT);
-        copyIntIfPresent(jobDataMap, result, AllClientPNames.SO_TIMEOUT);
+        copyIntIfPresent(jobDataMap, result, HttpClient.HTTP_CONN_MANAGER_TIMEOUT_KEY);
+        copyIntIfPresent(jobDataMap, result, HttpClient.HTTP_CONNECTION_TIMEOUT_KEY);
+        copyIntIfPresent(jobDataMap, result, HttpClient.HTTP_SOCKET_TIMEOUT_KEY);
         return result;
     }
 

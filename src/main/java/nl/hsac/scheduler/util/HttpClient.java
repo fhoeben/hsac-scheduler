@@ -2,15 +2,14 @@ package nl.hsac.scheduler.util;
 
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DecompressingHttpClient;
-import org.apache.http.impl.client.SystemDefaultHttpClient;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
-import org.apache.http.params.HttpParams;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
@@ -20,6 +19,13 @@ import java.util.Map;
  * Helper to make Http calls and get response.
  */
 public class HttpClient {
+    /** Key to use in properties/jobData to control time to get connection from pool. */
+    public static final String HTTP_CONN_MANAGER_TIMEOUT_KEY = "http.conn-manager.timeout";
+    /** Key to use in properties/jobData to control time to establish connection. */
+    public static final String HTTP_CONNECTION_TIMEOUT_KEY = "http.connection.timeout";
+    /** Key to use in properties/jobData to control time to complete request. */
+    public static final String HTTP_SOCKET_TIMEOUT_KEY = "http.socket.timeout";
+
     private static final int MAX_CONNECTIONS = PropertyHelper.getIntProperty("http.maxconnections.total");
     private static final int MAX_CONNECTIONS_PER_ROUTE = PropertyHelper.getIntProperty("http.maxconnections.perroute");
 
@@ -28,37 +34,22 @@ public class HttpClient {
     private org.apache.http.client.HttpClient httpClient;
 
     static {
-        SystemDefaultHttpClient backend = new SystemDefaultHttpClient();
-        setIntParam(backend, "http.connection.timeout");
-        setIntParam(backend, "http.socket.timeout");
-        setLongParam(backend, "http.conn-manager.timeout");
-
-        PoolingClientConnectionManager cm = (PoolingClientConnectionManager) backend.getConnectionManager();
+        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
         cm.setMaxTotal(MAX_CONNECTIONS);
         cm.setDefaultMaxPerRoute(MAX_CONNECTIONS_PER_ROUTE);
-        HTTP_CLIENT = new DecompressingHttpClient(backend);
-    }
 
-    /**
-     * Sets a http client property based on value in this application's property file.
-     * @param client client to set parameter on.
-     * @param key key for parameter, the value will be retrieved from property with same name.
-     */
-    private static void setIntParam(org.apache.http.client.HttpClient client, String key) {
-        HttpParams clientParams = client.getParams();
-        int value = PropertyHelper.getIntProperty(key);
-        clientParams.setParameter(key, value);
-    }
-
-    /**
-     * Sets a http client property based on value in this application's property file.
-     * @param client client to set parameter on.
-     * @param key key for parameter, the value will be retrieved from property with same name.
-     */
-    private static void setLongParam(org.apache.http.client.HttpClient client, String key) {
-        HttpParams clientParams = client.getParams();
-        long value = PropertyHelper.getLongProperty(key);
-        clientParams.setParameter(key, value);
+        RequestConfig rc = RequestConfig.custom()
+                .setConnectTimeout(PropertyHelper.getIntProperty(HTTP_CONNECTION_TIMEOUT_KEY))
+                .setConnectionRequestTimeout(PropertyHelper.getIntProperty(HTTP_CONN_MANAGER_TIMEOUT_KEY))
+                .setSocketTimeout(PropertyHelper.getIntProperty(HTTP_SOCKET_TIMEOUT_KEY))
+                .build();
+        HTTP_CLIENT = HttpClients.custom()
+                .useSystemProperties()
+                .disableContentCompression()
+                .setDefaultRequestConfig(rc)
+                .setUserAgent(HttpClient.class.getName())
+                .setConnectionManager(cm)
+                .build();
     }
 
     /**
@@ -66,7 +57,6 @@ public class HttpClient {
      */
     public HttpClient() {
         httpClient = HTTP_CLIENT;
-        httpClient.getParams().setParameter("http.useragent", getClass().getName());
     }
 
     /**
@@ -104,13 +94,32 @@ public class HttpClient {
 
     private void setParameters(HttpRequestBase method, Map<String, Object> parameters) {
         if (parameters != null) {
-            HttpParams methodParams = method.getParams();
-            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
-                String key = entry.getKey();
-                Object value = entry.getValue();
-                methodParams.setParameter(key, value);
+            boolean isCustom = false;
+            RequestConfig.Builder rc = RequestConfig.custom();
+            Integer connectTimeout = getIntValue(parameters, HTTP_CONNECTION_TIMEOUT_KEY);
+            if (connectTimeout != null) {
+                rc.setConnectTimeout(connectTimeout);
+                isCustom = true;
+            }
+            Integer socketTimeout = getIntValue(parameters, HTTP_SOCKET_TIMEOUT_KEY);
+            if (socketTimeout != null) {
+                rc.setSocketTimeout(socketTimeout);
+                isCustom = true;
+            }
+            Integer connectionMgrTimeout = getIntValue(parameters, HTTP_CONN_MANAGER_TIMEOUT_KEY);
+            if (connectionMgrTimeout != null) {
+                rc.setConnectionRequestTimeout(connectionMgrTimeout);
+                isCustom = true;
+            }
+            if (isCustom) {
+                method.setConfig(rc.build());
             }
         }
+    }
+
+    private Integer getIntValue(Map<String, Object> parameters, String key) {
+        Object value = parameters.get(key);
+        return (Integer) value;
     }
 
     private void setHeaders(HttpRequestBase method, Map<String, String> headers) {
@@ -126,7 +135,7 @@ public class HttpClient {
 
     private void getResponse(String url, HttpResponse response, HttpRequestBase method) {
         try {
-            org.apache.http.HttpResponse resp = getHttpResponse(url, method);
+            org.apache.http.HttpResponse resp = getHttpResponse(method);
             int returnCode = resp.getStatusLine().getStatusCode();
             response.setStatusCode(returnCode);
             String result = EntityUtils.toString(resp.getEntity());
@@ -140,12 +149,11 @@ public class HttpClient {
 
     /**
      * Executes method.
-     * @param url url to be called.
      * @param method method to be executed.
      * @return result.
      * @throws IOException if call could not be made.
      */
-    protected org.apache.http.HttpResponse getHttpResponse(String url, HttpRequestBase method) throws IOException {
+    protected org.apache.http.HttpResponse getHttpResponse(HttpRequestBase method) throws IOException {
         return httpClient.execute(method);
     }
 
