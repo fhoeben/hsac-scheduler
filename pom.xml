@@ -125,7 +125,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <doCheck>false</doCheck>
+                    <shortRevisionLength>6</shortRevisionLength>
                     <doUpdate>false</doUpdate>
                 </configuration>
             </plugin>
