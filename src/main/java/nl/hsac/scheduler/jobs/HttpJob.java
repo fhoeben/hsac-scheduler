@@ -138,12 +138,15 @@ public abstract class HttpJob extends JobBase {
      * @param response after request completed.
      */
     protected void handleResponse(JobExecutionContext context, String url, HttpResponse response) {
-        if (HttpStatus.SC_OK == response.getStatusCode()) {
-            String msg = String.format("%s response status code: OK (%s)", url, response.getStatusCode());
+        int statusCode = response.getStatusCode();
+        // between 200 and 299
+        if (HttpStatus.SC_OK >= statusCode
+                && statusCode < HttpStatus.SC_MULTIPLE_CHOICES) {
+            String msg = String.format("%s response status code: OK (%s)", url, statusCode);
             getLog().info(msg);
             reportStatus(context, true, msg);
         } else {
-            String msg = String.format("%s response status code: %s", url, response.getStatusCode());
+            String msg = String.format("%s response status code: %s", url, statusCode);
             getLog().warn(msg);
             reportStatus(context, false, msg);
         }
