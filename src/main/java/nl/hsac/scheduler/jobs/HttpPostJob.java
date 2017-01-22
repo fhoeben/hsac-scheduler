@@ -14,6 +14,21 @@ public class HttpPostJob extends HttpJob {
     /** Key the request will be retrieved from. */
     public static final String REQUEST_KEY = "request";
 
+    /**
+     * Creates new, with new HttpClient.
+     */
+    public HttpPostJob() {
+        super();
+    }
+
+    /**
+     * Creates new.
+     * @param client http client to use.
+     */
+    public HttpPostJob(HttpClient client) {
+        super(client);
+    }
+
     @Override
     protected HttpResponse createHttpResponse(String url, JobDataMap jobDataMap) {
         HttpResponse response = new HttpResponse();

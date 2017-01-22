@@ -22,7 +22,22 @@ import java.util.Map;
 public abstract class HttpJob extends JobBase {
     /** KEY used to determine URL. */
     public static final String URL_KEY = "url";
-    private final HttpClient client = new HttpClient();
+    private final HttpClient client;
+
+    /**
+     * Creates new, with new HttpClient.
+     */
+    public HttpJob() {
+        this(new HttpClient());
+    }
+
+    /**
+     * Creates new.
+     * @param client http client to use.
+     */
+    public HttpJob(HttpClient client) {
+        this.client = client;
+    }
 
     @Override
     protected void executeImpl(JobExecutionContext jobExecutionContext) throws JobExecutionException {
