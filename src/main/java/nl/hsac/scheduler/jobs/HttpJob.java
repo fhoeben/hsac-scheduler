@@ -58,6 +58,7 @@ public abstract class HttpJob extends JobBase {
                 headers.put(key.substring("header:".length()), value.toString());
             }
         }
+        getLog().trace("HTTP Headers for job: {}", headers);
         return headers;
     }
 
@@ -66,6 +67,7 @@ public abstract class HttpJob extends JobBase {
         copyIntIfPresent(jobDataMap, result, HttpClient.HTTP_CONN_MANAGER_TIMEOUT_KEY);
         copyIntIfPresent(jobDataMap, result, HttpClient.HTTP_CONNECTION_TIMEOUT_KEY);
         copyIntIfPresent(jobDataMap, result, HttpClient.HTTP_SOCKET_TIMEOUT_KEY);
+        getLog().trace("httpParams for job: {}", result);
         return result;
     }
 

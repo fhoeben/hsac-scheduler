@@ -11,6 +11,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Map;
@@ -26,6 +28,7 @@ public class HttpClient {
     /** Key to use in properties/jobData to control time to complete request. */
     public static final String HTTP_SOCKET_TIMEOUT_KEY = "http.socket.timeout";
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpClient.class);
     private static final int MAX_CONNECTIONS = PropertyHelper.getIntProperty("http.maxconnections.total");
     private static final int MAX_CONNECTIONS_PER_ROUTE = PropertyHelper.getIntProperty("http.maxconnections.perroute");
 
@@ -137,8 +140,10 @@ public class HttpClient {
         try {
             org.apache.http.HttpResponse resp = getHttpResponse(method);
             int returnCode = resp.getStatusLine().getStatusCode();
+            LOGGER.debug("Call returned status code: {}", returnCode);
             response.setStatusCode(returnCode);
             String result = EntityUtils.toString(resp.getEntity());
+            LOGGER.trace("Call returned: {}", result);
             response.setResponse(result);
         } catch (Exception e) {
             throw new RuntimeException("Unable to get response from: " + url, e);
@@ -154,7 +159,10 @@ public class HttpClient {
      * @throws IOException if call could not be made.
      */
     protected org.apache.http.HttpResponse getHttpResponse(HttpRequestBase method) throws IOException {
-        return httpClient.execute(method);
+        LOGGER.trace("Executing call");
+        org.apache.http.HttpResponse result = httpClient.execute(method);
+        LOGGER.trace("Executed call");
+        return result;
     }
 
     /**
