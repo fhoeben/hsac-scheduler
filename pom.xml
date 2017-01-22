@@ -31,9 +31,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://bitbucket.org/fhoeben/hsac-scheduler.git</connection>
-        <url>https://bitbucket.org/fhoeben/hsac-scheduler.git</url>
-        <developerConnection>scm:git:git://bitbucket.org/fhoeben/hsac-scheduler.git</developerConnection>
+        <connection>scm:git:git://github.com/fhoeben/hsac-scheduler.git</connection>
+        <url>https://github.com/fhoeben/hsac-scheduler.git</url>
+        <developerConnection>scm:git:git://github.com/fhoeben/hsac-scheduler.git</developerConnection>
     </scm>
 
     <properties>
