@@ -47,7 +47,7 @@ public class StatusCheckServlet  extends HttpServlet {
 
     private void writeHtml(HttpServletResponse response, String title, String version, Collection<String> results) throws IOException {
         PrintWriter writer = response.getWriter();
-        writer.format("<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"%s\">", response.getContentType());
+        writer.format("<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"%s\"/>", response.getContentType());
         writer.format("<title>%s</title>", title);
         writer.append("</head><body>");
         writer.format("<h1>%s</h1>", title);
