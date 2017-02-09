@@ -1,4 +1,5 @@
 # HSAC-scheduler
+[![Maven Central](https://img.shields.io/maven-central/v/nl.hsac/hsac-scheduler.svg?maxAge=86400)](https://mvnrepository.com/artifact/nl.hsac/hsac-scheduler)
 
 Sample/boilerplate web application using [Quartz scheduler](http://www.quartz-scheduler.org).
 It allows you to configure a set of http calls to made according to a schedule.
