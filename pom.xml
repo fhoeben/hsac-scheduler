@@ -147,7 +147,10 @@
                 <version>1.7.0</version>
                 <configuration>
                     <to>
-                        <image>hsac-scheduler:latest</image>
+                        <image>hsac/scheduler:${project.version}</image>
+                        <tags>
+                            <tag>latest</tag>
+                        </tags>
                     </to>
                     <container>
                         <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
