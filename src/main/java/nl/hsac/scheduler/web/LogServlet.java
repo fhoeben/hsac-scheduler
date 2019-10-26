@@ -12,12 +12,13 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Servlet to show log contents.
  */
 public class LogServlet extends HttpServlet {
-    private static final Logger LOG = LoggerFactory.getLogger(LogServlet.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final LogHelper LOG_HELPER = new LogHelper();
 
     @Override

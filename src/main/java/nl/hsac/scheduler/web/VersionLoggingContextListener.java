@@ -7,13 +7,14 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Context listener to log version on application stop/start.
  */
 @WebListener
 public class VersionLoggingContextListener implements ServletContextListener {
-    private static final Logger LOG = LoggerFactory.getLogger(VersionLoggingContextListener.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private String version = "unknown";
     private String applicationName = "application";
