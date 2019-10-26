@@ -1,7 +1,8 @@
 <configuration debug="false">
-    <property name="LOG_DIR" value="./" />
-    <property name="APP_NAME" value="scheduler" />
-    
+    <property name="LOG_DIR" value="${LOG_DIR:-./}" />
+    <property name="APP_NAME" value="${APP_NAME:-scheduler}" />
+    <property name="LOG_FILE" value="${LOG_FILE:-${APP_NAME}.log}" />
+
     <contextName>${APP_NAME}</contextName>
     <jmxConfigurator/>
     <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator" />
@@ -15,20 +16,20 @@
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_DIR}${APP_NAME}.log</file>
+        <file>${LOG_DIR}${LOG_FILE}</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- daily rollover -->
-            <fileNamePattern>${LOG_DIR}${APP_NAME}-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <fileNamePattern>${LOG_DIR}${LOG_FILE}-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
 
             <!-- keep 30 days' worth of history -->
-            <maxHistory>30</maxHistory>
+            <maxHistory>${LOG_FILE_DAYS_HISTORY:-30}</maxHistory>
         </rollingPolicy>
 
         <encoder>
             <pattern>%d %-5level [%thread] %logger - %X{triggerName} - %msg %ex%n</pattern>
         </encoder>
     </appender>
-    
+
     <root level="WARN">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="FILE" />
