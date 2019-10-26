@@ -198,6 +198,10 @@
                                 </goals>
                             </execution>
                         </executions>
+                        <configuration>
+                            <!-- needed to work with Java 8 while we have JavaDoc errors -->
+                            <doclint>none</doclint>
+                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
