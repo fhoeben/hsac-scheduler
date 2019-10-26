@@ -125,10 +125,10 @@
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.4.21.v20190926</version>
+                <version>9.4.14.v20181114</version>
                 <configuration>
                     <webApp>
-                        <contextPath>/scheduler</contextPath>
+                        <contextPath>/</contextPath>
                     </webApp>
                     <stopPort>9966</stopPort>
                     <stopKey>scheduler</stopKey>
@@ -140,6 +140,25 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>1.7.0</version>
+                <configuration>
+                    <to>
+                        <image>hsac-scheduler:latest</image>
+                    </to>
+                    <container>
+                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                        <ports>
+                            <port>8080</port>
+                        </ports>
+                        <environment>
+                            <app.version>${project.version}</app.version>
+                        </environment>
+                    </container>
+                </configuration>
             </plugin>
         </plugins>
         <finalName>scheduler</finalName>
