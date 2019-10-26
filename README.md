@@ -39,6 +39,6 @@ The easiest way to run the scheduler (after cloning) is via Maven using `mvn jet
 [http://localhost:8080/](http://localhost:8080/). 
 
 ## Running as Docker Container
-The scheduler can also be run as docker container using image hsac/scheduler:<version>.
+The scheduler can also be run as docker container using image [hsac/scheduler:&lt;version>](https://hub.docker.com/r/hsac/scheduler).
 The configuration can then be overridden by overwriting the config files (the same as present in src/main/resources) in 
-/jetty/webapps/ROOT/WEB-INF/classes.
+`/jetty/webapps/ROOT/WEB-INF/classes`.
