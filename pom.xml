@@ -156,6 +156,7 @@
                         </ports>
                         <environment>
                             <app.version>${project.version}</app.version>
+                            <LOG_FILE_DAYS_HISTORY>0</LOG_FILE_DAYS_HISTORY>
                         </environment>
                     </container>
                 </configuration>
