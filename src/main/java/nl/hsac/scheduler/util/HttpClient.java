@@ -2,9 +2,11 @@ package nl.hsac.scheduler.util;
 
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -72,9 +74,31 @@ public class HttpClient {
     public void post(String url, HttpResponse response, Map<String, String> headers, Map<String, Object> parameters) {
         HttpPost methodPost = new HttpPost(url);
         setParametersAndHeaders(methodPost, parameters, headers);
-        HttpEntity ent = new StringEntity(response.getRequest(), type);
-        methodPost.setEntity(ent);
+        setEntity(response, headers, methodPost);
         getResponse(url, response, methodPost);
+    }
+
+    /**
+     * @param url URL of service
+     * @param response response pre-populated with request to send. Response content and
+     *          statusCode will be filled.
+     * @param headers headers for request.
+     * @param parameters parameters for http client to set on request.
+     */
+    public void put(String url, HttpResponse response, Map<String, String> headers, Map<String, Object> parameters) {
+        HttpPut method = new HttpPut(url);
+        setParametersAndHeaders(method, parameters, headers);
+        setEntity(response, headers, method);
+        getResponse(url, response, method);
+    }
+
+    private void setEntity(HttpResponse response, Map<String, String> headers, HttpEntityEnclosingRequest method) {
+        ContentType contentType = type;
+        if (headers.containsKey("Content-Type")) {
+            contentType = ContentType.create(headers.get("Content-Type"));
+        }
+        HttpEntity ent = new StringEntity(response.getRequest(), contentType);
+        method.setEntity(ent);
     }
 
     /**

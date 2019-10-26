@@ -6,15 +6,15 @@ import nl.hsac.scheduler.util.HttpResponse;
 import java.util.Map;
 
 /**
- * Job to perform HTTP POST.
+ * Job to perform HTTP PUT.
  * Data to post is retrieved from key: request.
  */
-public class HttpPostJob extends HttpBodyJob {
+public class HttpPutJob extends HttpBodyJob {
 
     /**
      * Creates new, with new HttpClient.
      */
-    public HttpPostJob() {
+    public HttpPutJob() {
         super();
     }
 
@@ -22,13 +22,13 @@ public class HttpPostJob extends HttpBodyJob {
      * Creates new.
      * @param client http client to use.
      */
-    public HttpPostJob(HttpClient client) {
+    public HttpPutJob(HttpClient client) {
         super(client);
     }
 
     @Override
     protected void makeHttpCall(HttpClient client,  Map<String, Object> httpParams, Map<String, String> httpHeaders, String url, HttpResponse response) {
-        client.post(url, response, httpHeaders, httpParams);
+        client.put(url, response, httpHeaders, httpParams);
     }
 
 }

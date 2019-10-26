@@ -1,15 +1,14 @@
 package nl.hsac.scheduler.jobs;
 
-import nl.hsac.scheduler.util.FileUtil;
 import nl.hsac.scheduler.util.HttpClient;
-import org.quartz.JobDataMap;
+import nl.hsac.scheduler.util.HttpResponse;
+
+import java.util.Map;
 
 /**
  * Job that posts the contents of a (UTF-8) file on the classpath.
  */
-public class HttpPostFileJob extends HttpPostJob {
-    /** Key for file to post. */
-    public static final String FILENAME_KEY = "filename";
+public class HttpPostFileJob extends HttpFileBodyJob {
 
     /**
      * Creates new, with new HttpClient.
@@ -27,8 +26,7 @@ public class HttpPostFileJob extends HttpPostJob {
     }
 
     @Override
-    protected String getRequest(JobDataMap jobDataMap) {
-        String filename = jobDataMap.getString(FILENAME_KEY);
-        return FileUtil.loadFile(filename);
+    protected void makeHttpCall(HttpClient client, Map<String, Object> httpParams, Map<String, String> httpHeaders, String url, HttpResponse response) {
+        client.post(url, response, httpHeaders, httpParams);
     }
 }
