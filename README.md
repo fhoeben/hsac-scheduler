@@ -12,6 +12,8 @@ The http calls to be made can be:
 - GET
 - POST with body in `jobs.xml`
 - POST with body from file
+- PUT with body in `jobs.xml`
+- PUT with body from file
 
 Http calls are made using [Apache http client](http://hc.apache.org/httpcomponents-client-ga/), 
 default timeouts and connection management are configured in `scheduler.properties`. The timeouts can be overridden
@@ -34,4 +36,9 @@ To run the scheduler, deploy the 'WAR' to a Java servlet engine (e.g. [Jetty](ht
 
 The easiest way to run the scheduler (after cloning) is via Maven using `mvn jetty:run`, which will start a Jetty instance 
 (listening on port 8080) running the scheduler. It can then be accessed on 
-[http://localhost:8080/scheduler/](http://localhost:8080/scheduler/). 
+[http://localhost:8080/](http://localhost:8080/). 
+
+## Running as Docker Container
+The scheduler can also be run as docker container using image hsac/scheduler:<version>.
+The configuration can then be overridden by overwriting the config files (the same as present in src/main/resources) in 
+/jetty/webapps/ROOT/WEB-INF/classes.
