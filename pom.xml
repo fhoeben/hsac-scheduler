@@ -153,11 +153,13 @@
                         </tags>
                     </to>
                     <container>
+                        <user>1000</user>
                         <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
                         <ports>
                             <port>8080</port>
                         </ports>
                         <environment>
+                            <LOG_DIR>/tmp/</LOG_DIR>
                             <app.version>${project.version}</app.version>
                             <LOG_FILE_DAYS_HISTORY>0</LOG_FILE_DAYS_HISTORY>
                         </environment>
