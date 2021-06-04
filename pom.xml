@@ -40,7 +40,7 @@
     <properties>
         <logback.version>1.2.3</logback.version>
         <quartz.version>2.3.2</quartz.version>
-        <httpClient.version>4.5.10</httpClient.version>
+        <httpClient.version>4.5.13</httpClient.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
